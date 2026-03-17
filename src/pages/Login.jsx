@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
-import api from '../api/axios'
+import { useAuth } from '../store/AuthContext'
+import api from '../services/api'
 
 export default function Login() {
   const navigate = useNavigate()
