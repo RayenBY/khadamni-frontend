@@ -1,9 +1,30 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Navigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useAuth } from '../store/AuthContext'
+import { useTheme } from '../store/ThemeContext'
+import logo from '../assets/images/logo.png'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faBars, faCheck, faChevronDown, faMoon, faStar, faSun, faXmark } from '@fortawesome/free-solid-svg-icons'
+
+const LANGS = [
+  { code: 'fr', label: 'Français', flag: 'fr' },
+  { code: 'en', label: 'English',  flag: 'gb' },
+  { code: 'ar', label: 'العربية',  flag: 'tn' },
+]
 
 export default function Welcome() {
   const navigate = useNavigate()
+  const { token } = useAuth()
+  const { t, i18n } = useTranslation()
+  const { isDark, toggle: toggleTheme } = useTheme()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [langOpen, setLangOpen] = useState(false)
+
+  const currentLang = LANGS.find(l => l.code === i18n.language) || LANGS[0]
+
+  // Redirect authenticated users away from the landing page
+  if (token) return <Navigate to="/dashboard" replace />
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -19,7 +40,7 @@ export default function Welcome() {
   }, [])
 
   return (
-    <div style={{ fontFamily: "'Sora', sans-serif", background: '#fff', overflowX: 'hidden' }}>
+    <div style={{ fontFamily: "'Sora', sans-serif", background: 'var(--surface)', overflowX: 'hidden' }}>
       <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
 
       <style>{`
@@ -46,15 +67,15 @@ export default function Welcome() {
           font-family: 'Sora', sans-serif;
           transition: background 0.2s, transform 0.15s; white-space: nowrap;
         }
-        .btn-outline:hover { background: #f0faf4; transform: translateY(-2px); }
+        .btn-outline:hover { background: var(--primary-light); transform: translateY(-2px); }
         .card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .card-hover:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
         .tag {
-          display: inline-block; background: #e8f5ee; color: #1a7a3c;
+          display: inline-block; background: var(--border); color: #1a7a3c;
           padding: 6px 16px; border-radius: 100px;
           font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
         }
-        .nav-link { color: #333; text-decoration: none; font-size: 15px; font-weight: 500; transition: color 0.2s; }
+        .nav-link { color: var(--text-2); text-decoration: none; font-size: 15px; font-weight: 500; transition: color 0.2s; }
         .nav-link:hover { color: #1a7a3c; }
         .img-cover { width: 100%; height: 100%; object-fit: cover; display: block; }
         .governorate-pill {
@@ -71,7 +92,7 @@ export default function Welcome() {
           min-height: 100vh; padding-top: 68px;
         }
         .hero-left { padding: 80px 48px 80px 72px; }
-        .hero-title { font-size: 58px; font-weight: 800; line-height: 1.1; color: #0d1f14; margin-top: 20px; margin-bottom: 20px; }
+        .hero-title { font-size: 58px; font-weight: 800; line-height: 1.1; color: var(--text); margin-top: 20px; margin-bottom: 20px; }
         .hero-img-grid {
           display: grid; grid-template-rows: 1fr 1fr; grid-template-columns: 1fr 1fr;
           gap: 8px; padding: 76px 32px 8px 0; height: 100vh;
@@ -85,7 +106,7 @@ export default function Welcome() {
         .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
         .mobile-menu {
           display: none; position: fixed; top: 68px; left: 0; right: 0;
-          background: #fff; border-bottom: 1px solid #e8f5ee;
+          background: var(--surface); border-bottom: 1px solid var(--border);
           padding: 20px 24px; flex-direction: column; gap: 16px;
           z-index: 99; box-shadow: 0 8px 24px rgba(0,0,0,0.08);
         }
@@ -121,51 +142,82 @@ export default function Welcome() {
           .hero-title { font-size: 28px; }
           .hero-img-grid { height: 240px; }
         }
+        .lang-dd-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 14px; background: none; border: none; cursor: pointer; font-family: 'Sora',sans-serif; font-size: 13px; color: var(--text-2); transition: background .15s; text-align: left; }
+        .lang-dd-item:hover { background: var(--primary-light); }
       `}</style>
+
+      {langOpen && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 98 }} onClick={() => setLangOpen(false)} />
+      )}
 
       {/* NAVBAR */}
       <nav style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-        background: 'rgba(255,255,255,0.93)', backdropFilter: 'blur(12px)',
-        borderBottom: '1px solid #e8f5ee', height: '68px',
+        background: 'var(--nav-bg)', backdropFilter: 'blur(12px)',
+        borderBottom: '1px solid var(--border)', height: '68px',
         display: 'flex', alignItems: 'center',
       }}>
         <div className="nav-inner" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '0 60px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: '#1a7a3c', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path d="M10 2L3 7v11h5v-5h4v5h5V7L10 2z" fill="white"/>
-              </svg>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <img src={logo} alt="Khadamni" style={{ height: 40, display: 'block', filter: isDark ? 'brightness(0) invert(1)' : 'none' }} />
+          </div>
+          <div className="nav-btns-desktop" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {/* Dark mode toggle */}
+            <button onClick={toggleTheme} style={{ background: 'none', border: '1.5px solid var(--border-2)', borderRadius: 100, width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-faint)', transition: 'all .18s', flexShrink: 0 }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = '#1a7a3c'; e.currentTarget.style.color = '#1a7a3c' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border-2)'; e.currentTarget.style.color = 'var(--text-faint)' }}>
+              {isDark
+                ? <FontAwesomeIcon icon={faSun} style={{ fontSize: 16 }} />
+                : <FontAwesomeIcon icon={faMoon} style={{ fontSize: 16 }} />
+              }
+            </button>
+            {/* Language dropdown */}
+            <div style={{ position: 'relative' }}>
+              <button onClick={() => setLangOpen(v => !v)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 10px 5px 6px', borderRadius: 100, border: `1.5px solid ${langOpen ? 'var(--border-3)' : 'var(--border-2)'}`, background: langOpen ? 'var(--primary-light)' : 'var(--surface)', cursor: 'pointer', fontFamily: 'Sora,sans-serif', transition: 'all .18s' }}>
+                <span className={`fi fi-${currentLang.flag}`} style={{ width: 22, height: 22, borderRadius: '50%', backgroundSize: 'cover', display: 'inline-block', flexShrink: 0 }} />
+                <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>{currentLang.code.toUpperCase()}</span>
+                <FontAwesomeIcon icon={faChevronDown} style={{ fontSize: 11, transform: langOpen ? 'rotate(180deg)' : 'none', transition: 'transform .2s', flexShrink: 0, color: '#999' }} />
+              </button>
+              {langOpen && (
+                <div style={{ position: 'absolute', top: 'calc(100% + 8px)', right: 0, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, boxShadow: '0 8px 32px rgba(0,0,0,0.1)', minWidth: 160, overflow: 'hidden', zIndex: 101 }}>
+                  {LANGS.map(l => (
+                    <button key={l.code} className="lang-dd-item" onClick={() => { i18n.changeLanguage(l.code); setLangOpen(false) }}>
+                      <span className={`fi fi-${l.flag}`} style={{ width: 24, height: 24, borderRadius: '50%', backgroundSize: 'cover', display: 'inline-block', flexShrink: 0 }} />
+                      <span style={{ flex: 1 }}>{l.label}</span>
+                      {i18n.language === l.code && <span style={{ color: '#1a7a3c', fontWeight: 700, fontSize: 14 }}><FontAwesomeIcon icon={faCheck} /></span>}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-            <span style={{ fontSize: 20, fontWeight: 800, color: '#111' }}>Khadamni</span>
-          </div>
-          <div className="nav-links-desktop">
-            <a href="#how" className="nav-link">Comment ça marche</a>
-            <a href="#jobs" className="nav-link">Offres</a>
-            <a href="#talents" className="nav-link">Talents</a>
-          </div>
-          <div className="nav-btns-desktop">
-            <button className="btn-outline" style={{ padding: '10px 22px', fontSize: '14px' }} onClick={() => navigate('/login')}>Se connecter</button>
-            <button className="btn-primary" style={{ padding: '10px 22px', fontSize: '14px' }} onClick={() => navigate('/register')}>S'inscrire</button>
+            <button className="btn-outline" style={{ padding: '10px 22px', fontSize: '14px' }} onClick={() => navigate('/login')}>{t('common.login')}</button>
+            <button className="btn-primary" style={{ padding: '10px 22px', fontSize: '14px' }} onClick={() => navigate('/register')}>{t('common.register')}</button>
           </div>
           <button className="hamburger" onClick={() => setMenuOpen(!menuOpen)}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1a7a3c" strokeWidth="2.5" strokeLinecap="round">
-              {menuOpen
-                ? <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>
-                : <><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></>
-              }
-            </svg>
+            <FontAwesomeIcon icon={menuOpen ? faXmark : faBars} style={{ fontSize: 24, color: '#1a7a3c' }} />
           </button>
         </div>
       </nav>
 
       {/* MOBILE MENU */}
       <div className={`mobile-menu ${menuOpen ? 'open' : ''}`}>
-        <a href="#how" className="nav-link" onClick={() => setMenuOpen(false)}>Comment ça marche</a>
-        <a href="#jobs" className="nav-link" onClick={() => setMenuOpen(false)}>Offres</a>
-        <a href="#talents" className="nav-link" onClick={() => setMenuOpen(false)}>Talents</a>
-        <button className="btn-outline" style={{ marginTop: 8 }} onClick={() => navigate('/login')}>Se connecter</button>
-        <button className="btn-primary" onClick={() => navigate('/register')}>S'inscrire</button>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          {LANGS.map(l => (
+            <button key={l.code} onClick={() => { i18n.changeLanguage(l.code); setMenuOpen(false) }}
+              style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '5px 10px', borderRadius: 100, border: `1.5px solid ${i18n.language === l.code ? '#1a7a3c' : 'var(--border-2)'}`, background: i18n.language === l.code ? 'var(--primary-light)' : 'var(--surface)', cursor: 'pointer', fontFamily: 'Sora,sans-serif', fontSize: 12, fontWeight: 700, color: i18n.language === l.code ? '#1a7a3c' : 'var(--text-muted)', transition: 'all .15s' }}>
+              <span className={`fi fi-${l.flag}`} style={{ width: 18, height: 18, borderRadius: '50%', backgroundSize: 'cover', display: 'inline-block' }} />
+              <span>{l.code.toUpperCase()}</span>
+            </button>
+          ))}
+          <button onClick={toggleTheme} style={{ background: 'none', border: '1.5px solid var(--border-2)', borderRadius: 100, width: 38, height: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-faint)', flexShrink: 0 }}>
+            {isDark
+              ? <FontAwesomeIcon icon={faSun} style={{ fontSize: 16 }} />
+              : <FontAwesomeIcon icon={faMoon} style={{ fontSize: 16 }} />
+            }
+          </button>
+        </div>
+        <button className="btn-outline" style={{ marginTop: 8 }} onClick={() => navigate('/login')}>{t('common.login')}</button>
+        <button className="btn-primary" onClick={() => navigate('/register')}>{t('common.register')}</button>
       </div>
 
       {/* HERO */}
@@ -173,9 +225,9 @@ export default function Welcome() {
         <div className="hero-img-grid">
           <div style={{ borderRadius: '20px', overflow: 'hidden', gridRow: '1 / 3', position: 'relative' }}>
             <img className="img-cover" src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&q=80" alt="worker" />
-            <div style={{ position: 'absolute', bottom: 16, left: 16, right: 16, background: 'rgba(255,255,255,0.95)', borderRadius: 14, padding: '12px 16px' }}>
-              <div style={{ fontWeight: 700, fontSize: 14, color: '#0d1f14' }}>Ahmed B.</div>
-              <div style={{ fontSize: 12, color: '#1a7a3c', marginTop: 2 }}>⭐ 4.9 · Informatique · Tunis</div>
+            <div style={{ position: 'absolute', bottom: 16, left: 16, right: 16, background: 'var(--surface)', borderRadius: 14, padding: '12px 16px' }}>
+              <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)' }}>Ahmed B.</div>
+              <div style={{ fontSize: 12, color: '#1a7a3c', marginTop: 2 }}><FontAwesomeIcon icon={faStar} style={{ marginRight: 4 }} />4.9 · Informatique · Tunis</div>
             </div>
           </div>
           <div style={{ borderRadius: '20px', overflow: 'hidden' }}>
@@ -186,57 +238,57 @@ export default function Welcome() {
           </div>
         </div>
         <div className="hero-left">
-          <div className="reveal"><span className="tag">🇹🇳 Plateforme #1 en Tunisie</span></div>
+          <div className="reveal"><span className="tag">{t('welcome.heroTag')}</span></div>
           <h1 className="reveal d1 hero-title">
-            Trouve un job.<br />
-            <span style={{ color: '#1a7a3c' }}>Recrute un talent.</span>
+            {t('welcome.heroTitle1')}<br />
+            <span style={{ color: '#1a7a3c' }}>{t('welcome.heroTitle2')}</span>
           </h1>
-          <p className="reveal d2" style={{ fontSize: '17px', color: '#555', lineHeight: 1.7, maxWidth: '440px', marginBottom: '36px' }}>
-            Khadamni connecte employeurs et travailleurs à travers les 24 gouvernorats de la Tunisie. Simple, rapide, local.
+          <p className="reveal d2" style={{ fontSize: '17px', color: 'var(--text-muted)', lineHeight: 1.7, maxWidth: '440px', marginBottom: '36px' }}>
+            {t('welcome.heroSubtitle')}
           </p>
           <div className="reveal d3 hero-btns">
-            <button className="btn-primary" onClick={() => navigate('/register')}>Commencer gratuitement →</button>
-            <button className="btn-outline" onClick={() => navigate('/login')}>Se connecter</button>
+            <button className="btn-primary" onClick={() => navigate('/register')}>{t('welcome.startFree')}</button>
+            <button className="btn-outline" onClick={() => navigate('/login')}>{t('common.login')}</button>
           </div>
           <div className="reveal stats-row">
             <div>
               <div style={{ fontSize: '40px', fontWeight: 800, color: '#1a7a3c', lineHeight: 1 }}>2.4K+</div>
-              <div style={{ color: '#888', fontSize: '13px', marginTop: '4px' }}>Offres publiées</div>
+              <div style={{ color: 'var(--text-faint)', fontSize: '13px', marginTop: '4px' }}>{t('welcome.stats_offers')}</div>
             </div>
             <div className="stat-divider" />
             <div>
               <div style={{ fontSize: '40px', fontWeight: 800, color: '#1a7a3c', lineHeight: 1 }}>8K+</div>
-              <div style={{ color: '#888', fontSize: '13px', marginTop: '4px' }}>Travailleurs actifs</div>
+              <div style={{ color: 'var(--text-faint)', fontSize: '13px', marginTop: '4px' }}>{t('welcome.stats_workers')}</div>
             </div>
             <div className="stat-divider" />
             <div>
               <div style={{ fontSize: '40px', fontWeight: 800, color: '#1a7a3c', lineHeight: 1 }}>24</div>
-              <div style={{ color: '#888', fontSize: '13px', marginTop: '4px' }}>Gouvernorats</div>
+              <div style={{ color: 'var(--text-faint)', fontSize: '13px', marginTop: '4px' }}>{t('welcome.stats_regions')}</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* HOW IT WORKS */}
-      <section id="how" className="section-pad" style={{ background: '#f9fdf9' }}>
+      <section id="how" className="section-pad" style={{ background: 'var(--bg)' }}>
         <div style={{ textAlign: 'center', marginBottom: '56px' }}>
-          <span className="tag reveal">Comment ça marche</span>
-          <h2 className="reveal d1 section-title" style={{ fontWeight: 800, color: '#0d1f14', marginTop: '16px' }}>Simple comme bonjour</h2>
+          <span className="tag reveal">{t('welcome.howTag')}</span>
+          <h2 className="reveal d1 section-title" style={{ fontWeight: 800, color: 'var(--text)', marginTop: '16px' }}>{t('welcome.howTitle')}</h2>
         </div>
         <div className="steps-grid">
           {[
-            { step: '01', title: 'Crée ton compte', desc: "Inscris-toi en tant qu'employeur ou travailleur en moins de 2 minutes.", img: 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=400&q=80' },
-            { step: '02', title: 'Choisis ton gouvernorat', desc: 'Sélectionne ta région sur la carte interactive de la Tunisie.', img: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=400&q=80' },
-            { step: '03', title: 'Connecte-toi', desc: "Poste une offre ou postule directement. C'est aussi simple que ça.", img: 'https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?w=400&q=80' },
+            { step: '01', title: t('welcome.step1_title'), desc: t('welcome.step1_desc'), img: 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=400&q=80' },
+            { step: '02', title: t('welcome.step2_title'), desc: t('welcome.step2_desc'), img: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=400&q=80' },
+            { step: '03', title: t('welcome.step3_title'), desc: t('welcome.step3_desc'), img: 'https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?w=400&q=80' },
           ].map((item, i) => (
-            <div key={i} className={`reveal d${i} card-hover`} style={{ background: '#fff', borderRadius: '24px', overflow: 'hidden', border: '1px solid #e8f5ee' }}>
+            <div key={i} className={`reveal d${i} card-hover`} style={{ background: 'var(--surface)', borderRadius: '24px', overflow: 'hidden', border: '1px solid var(--border)' }}>
               <div style={{ height: '190px', overflow: 'hidden' }}>
                 <img className="img-cover" src={item.img} alt={item.title} />
               </div>
               <div style={{ padding: '24px' }}>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: '#1a7a3c', letterSpacing: '0.1em', marginBottom: '8px' }}>ÉTAPE {item.step}</div>
-                <div style={{ fontSize: '19px', fontWeight: 700, color: '#0d1f14', marginBottom: '8px' }}>{item.title}</div>
-                <div style={{ fontSize: '14px', color: '#666', lineHeight: 1.6 }}>{item.desc}</div>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: '#1a7a3c', letterSpacing: '0.1em', marginBottom: '8px' }}>{`${t('welcome.step')} ${item.step}`}</div>
+                <div style={{ fontSize: '19px', fontWeight: 700, color: 'var(--text)', marginBottom: '8px' }}>{item.title}</div>
+                <div style={{ fontSize: '14px', color: 'var(--text-muted)', lineHeight: 1.6 }}>{item.desc}</div>
               </div>
             </div>
           ))}
@@ -244,12 +296,12 @@ export default function Welcome() {
       </section>
 
       {/* GOVERNORATES */}
-      <section className="section-pad" style={{ background: '#fff' }}>
+      <section className="section-pad" style={{ background: 'var(--surface)' }}>
         <div style={{ maxWidth: '860px', margin: '0 auto', textAlign: 'center' }}>
-          <span className="tag reveal">Couverture nationale</span>
-          <h2 className="reveal d1 section-title" style={{ fontWeight: 800, color: '#0d1f14', margin: '16px 0 14px' }}>Partout en Tunisie</h2>
-          <p className="reveal d2" style={{ fontSize: '16px', color: '#666', marginBottom: '40px', lineHeight: 1.7 }}>
-            Des offres disponibles dans les 24 gouvernorats. Filtre par région et trouve ce qui est proche de toi.
+          <span className="tag reveal">{t('welcome.coverageTag')}</span>
+          <h2 className="reveal d1 section-title" style={{ fontWeight: 800, color: 'var(--text)', margin: '16px 0 14px' }}>{t('welcome.coverageTitle')}</h2>
+          <p className="reveal d2" style={{ fontSize: '16px', color: 'var(--text-muted)', marginBottom: '40px', lineHeight: 1.7 }}>
+            {t('welcome.coverageDesc')}
           </p>
           <div className="reveal">
             {['Tunis','Sfax','Sousse','Monastir','Bizerte','Nabeul','Ariana','Ben Arous',
@@ -263,42 +315,42 @@ export default function Welcome() {
       </section>
 
       {/* ROLES */}
-      <section id="jobs" className="section-pad" style={{ background: '#f9fdf9' }}>
+      <section id="jobs" className="section-pad" style={{ background: 'var(--bg)' }}>
         <div className="roles-grid">
           <div className="reveal card-hover" style={{ background: '#0d1f14', borderRadius: '28px', overflow: 'hidden', color: '#fff' }}>
             <div style={{ height: '240px', overflow: 'hidden', position: 'relative' }}>
               <img className="img-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80" alt="employer" style={{ filter: 'brightness(0.55)' }} />
               <div style={{ position: 'absolute', top: 20, left: 20 }}>
-                <span style={{ background: '#1a7a3c', color: '#fff', padding: '5px 14px', borderRadius: 100, fontSize: 12, fontWeight: 600 }}>Employeur</span>
+                <span style={{ background: '#1a7a3c', color: '#fff', padding: '5px 14px', borderRadius: 100, fontSize: 12, fontWeight: 600 }}>{t('welcome.employerTag')}</span>
               </div>
             </div>
             <div style={{ padding: '32px' }}>
-              <h3 style={{ fontSize: '26px', fontWeight: 800, marginBottom: '14px' }}>Tu recrutes ?</h3>
+              <h3 style={{ fontSize: '26px', fontWeight: 800, marginBottom: '14px' }}>{t('welcome.employerTitle')}</h3>
               <p style={{ color: '#9dc9ac', lineHeight: 1.7, marginBottom: '20px', fontSize: 15 }}>
-                Publie tes offres, reçois des candidatures et trouve le bon profil parmi des milliers de travailleurs tunisiens.
+                {t('welcome.employerDesc')}
               </p>
-              {['Publie une offre en 2 min','Filtre par gouvernorat','Accepte ou refuse des candidats','Notifications en temps réel'].map(f => (
-                <div key={f} className="check-item"><span style={{ color: '#4caf73', fontSize: 18 }}>✓</span><span style={{ color: '#c8e6d0', fontSize: 14 }}>{f}</span></div>
+              {[t('welcome.employer_f1'), t('welcome.employer_f2'), t('welcome.employer_f3'), t('welcome.employer_f4')].map(f => (
+                <div key={f} className="check-item"><span style={{ color: '#4caf73', fontSize: 18 }}><FontAwesomeIcon icon={faCheck} /></span><span style={{ color: '#c8e6d0', fontSize: 14 }}>{f}</span></div>
               ))}
-              <button className="btn-primary" onClick={() => navigate('/register')} style={{ width: '100%', marginTop: '24px', textAlign: 'center' }}>Recruter maintenant →</button>
+              <button className="btn-primary" onClick={() => navigate('/register')} style={{ width: '100%', marginTop: '24px', textAlign: 'center' }}>{t('welcome.employerCta')}</button>
             </div>
           </div>
-          <div className="reveal d1 card-hover" style={{ background: '#fff', borderRadius: '28px', overflow: 'hidden', border: '2px solid #1a7a3c' }}>
+          <div className="reveal d1 card-hover" style={{ background: 'var(--surface)', borderRadius: '28px', overflow: 'hidden', border: '2px solid #1a7a3c' }}>
             <div style={{ height: '240px', overflow: 'hidden', position: 'relative' }}>
               <img className="img-cover" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&q=80" alt="worker" style={{ filter: 'brightness(0.7)' }} />
               <div style={{ position: 'absolute', top: 20, left: 20 }}>
-                <span style={{ background: '#fff', color: '#1a7a3c', padding: '5px 14px', borderRadius: 100, fontSize: 12, fontWeight: 600 }}>Travailleur</span>
+                <span style={{ background: 'var(--surface)', color: '#1a7a3c', padding: '5px 14px', borderRadius: 100, fontSize: 12, fontWeight: 600 }}>{t('welcome.workerTag')}</span>
               </div>
             </div>
             <div style={{ padding: '32px' }}>
-              <h3 style={{ fontSize: '26px', fontWeight: 800, color: '#0d1f14', marginBottom: '14px' }}>Tu cherches un job ?</h3>
-              <p style={{ color: '#555', lineHeight: 1.7, marginBottom: '20px', fontSize: 15 }}>
-                Crée ton profil, montre tes compétences et postule aux offres près de chez toi en quelques clics.
+              <h3 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--text)', marginBottom: '14px' }}>{t('welcome.workerTitle')}</h3>
+              <p style={{ color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: '20px', fontSize: 15 }}>
+                {t('welcome.workerDesc')}
               </p>
-              {['Profil complet et visible','Postule en 1 clic','Reçois des notifications','Avis et évaluations'].map(f => (
-                <div key={f} className="check-item"><span style={{ color: '#1a7a3c', fontSize: 18 }}>✓</span><span style={{ color: '#444', fontSize: 14 }}>{f}</span></div>
+              {[t('welcome.worker_f1'), t('welcome.worker_f2'), t('welcome.worker_f3'), t('welcome.worker_f4')].map(f => (
+                <div key={f} className="check-item"><span style={{ color: '#1a7a3c', fontSize: 18 }}><FontAwesomeIcon icon={faCheck} /></span><span style={{ color: 'var(--text-2)', fontSize: 14 }}>{f}</span></div>
               ))}
-              <button className="btn-primary" onClick={() => navigate('/register')} style={{ width: '100%', marginTop: '24px', textAlign: 'center' }}>Trouver un job →</button>
+              <button className="btn-primary" onClick={() => navigate('/register')} style={{ width: '100%', marginTop: '24px', textAlign: 'center' }}>{t('welcome.workerCta')}</button>
             </div>
           </div>
         </div>
@@ -306,12 +358,12 @@ export default function Welcome() {
 
       {/* CTA */}
       <section className="section-pad" style={{ textAlign: 'center', background: 'linear-gradient(135deg, #0d1f14 0%, #1a7a3c 100%)', color: '#fff' }}>
-        <h2 className="reveal cta-title" style={{ fontWeight: 800, marginBottom: '18px' }}>Prêt à commencer ?</h2>
+        <h2 className="reveal cta-title" style={{ fontWeight: 800, marginBottom: '18px' }}>{t('welcome.ctaTitle')}</h2>
         <p className="reveal d1" style={{ fontSize: '17px', color: '#9dc9ac', maxWidth: '460px', margin: '0 auto 40px' }}>
-          Rejoins des milliers de Tunisiens qui utilisent Khadamni pour trouver et offrir du travail.
+          {t('welcome.ctaDesc')}
         </p>
         <button className="reveal d2" onClick={() => navigate('/register')} style={{
-          background: '#fff', color: '#1a7a3c', border: 'none',
+          background: 'var(--surface)', color: '#1a7a3c', border: 'none',
           padding: '18px 44px', borderRadius: 100, fontSize: 16, fontWeight: 700,
           cursor: 'pointer', fontFamily: 'Sora, sans-serif',
           boxShadow: '0 4px 24px rgba(0,0,0,0.2)', transition: 'transform 0.15s', display: 'inline-block'
@@ -319,22 +371,17 @@ export default function Welcome() {
           onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
           onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
         >
-          Créer mon compte gratuitement
+          {t('welcome.ctaBtn')}
         </button>
       </section>
 
       {/* FOOTER */}
       <footer style={{ padding: '36px 60px', background: '#0a1a10' }}>
         <div className="footer-inner">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ width: 28, height: 28, borderRadius: 8, background: '#1a7a3c', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
-                <path d="M10 2L3 7v11h5v-5h4v5h5V7L10 2z" fill="white"/>
-              </svg>
-            </div>
-            <span style={{ color: '#fff', fontWeight: 700, fontSize: 15 }}>Khadamni</span>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <img src={logo} alt="Khadamni" style={{ height: 30, display: 'block', filter: 'brightness(0) invert(1)' }} />
           </div>
-          <div style={{ color: '#5a8a6a', fontSize: 13 }}>© 2026 Khadamni · Tunisie · Tous droits réservés</div>
+          <div style={{ color: '#5a8a6a', fontSize: 13 }}>{t('welcome.footer')}</div>
         </div>
       </footer>
     </div>
