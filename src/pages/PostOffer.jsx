@@ -12,7 +12,7 @@ const CITIES = ['Tunis', 'Sfax', 'Sousse', 'Monastir', 'Bizerte', 'Nabeul', 'Aut
 const SALARY_UNITS = ['heure', 'jour', 'semaine', 'forfait']
 const CATEGORY_ICONS = { restaurant: faBriefcase, café: faBriefcase, jardinage: faBriefcase, nettoyage: faBriefcase, agricole: faBriefcase, livraison: faBriefcase, design: faBriefcase, informatique: faBriefcase, événementiel: faBriefcase, autre: faBox }
 
-const EMPTY_FORM = { title: '', category: '', description: '', 'location.city': '', 'location.address': '', 'salary.amount': '', 'salary.unit': 'jour', duration: '', startDate: '', urgent: false, requiredSkills: [] }
+const EMPTY_FORM = { title: '', category: '', description: '', 'location.city': '', 'location.address': '', 'salary.amount': '', 'salary.unit': 'jour', duration: '', startDate: new Date().toISOString().split('T')[0], urgent: false, requiredSkills: [] }
 
 export default function PostOffer() {
   const navigate = useNavigate()

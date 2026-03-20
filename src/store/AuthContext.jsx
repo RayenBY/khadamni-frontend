@@ -1,4 +1,5 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useCallback } from 'react';
+import api from '../services/api';
 
 const AuthContext = createContext();
 
@@ -23,8 +24,20 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('token');
   };
 
+  const refreshUser = useCallback(async () => {
+    try {
+      const res = await api.get('/auth/me');
+      const updated = res.data.data.user;
+      setUser(updated);
+      localStorage.setItem('user', JSON.stringify(updated));
+      return updated;
+    } catch (err) {
+      console.error('refreshUser failed', err);
+    }
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ user, token, login, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

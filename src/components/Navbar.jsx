@@ -1,11 +1,12 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../store/AuthContext'
 import { useTheme } from '../store/ThemeContext'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import logo from '../assets/images/logo.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars, faCheck, faChevronDown, faCoins, faMoon, faSun, faXmark } from '@fortawesome/free-solid-svg-icons'
+import NotificationBell from './NotificationBell'
 
 const FONT = "https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&display=swap"
 
@@ -18,7 +19,7 @@ const LANGS = [
 export default function Navbar() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { user, logout } = useAuth()
+  const { user, logout, refreshUser } = useAuth()
   const { isDark, toggle: toggleTheme } = useTheme()
   const { t, i18n } = useTranslation()
   const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -26,6 +27,10 @@ export default function Navbar() {
   const [langOpen, setLangOpen] = useState(false)
 
   const currentLang = LANGS.find(l => l.code === i18n.language) || LANGS[0]
+
+  useEffect(() => {
+    if (user) refreshUser?.()
+  }, [location.pathname])
 
   const handleLogout = () => {
     logout()
@@ -79,10 +84,12 @@ export default function Navbar() {
         .lang-dd-item:hover { background: var(--primary-light); }
         .theme-toggle { background: none; border: 1.5px solid var(--border); border-radius: 100px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .18s; color: var(--text-faint); }
         .theme-toggle:hover { border-color: #1a7a3c; color: #1a7a3c; background: var(--primary-light); }
+        .token-badge { display: flex; align-items: center; gap: 5px; background: var(--primary-light); border: 1.5px solid var(--border-3); border-radius: 100px; padding: 5px 12px; font-size: 12px; font-weight: 700; color: #1a7a3c; white-space: nowrap; }
         @media (max-width: 680px) {
           .nav-center { display: none !important; }
           .nav-right  { display: none !important; }
           .ham        { display: block !important; }
+          .token-badge { display: none !important; }
         }
       `}</style>
 
@@ -110,6 +117,18 @@ export default function Navbar() {
           </div>
 
           <div className="nav-right" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+
+            {/* Token balance */}
+            {user && (
+              <div className="token-badge">
+                <FontAwesomeIcon icon={faCoins} style={{ fontSize: 12 }} />
+                {user.tokens ?? 0}
+              </div>
+            )}
+
+            {/* Notification bell */}
+            {user && <NotificationBell />}
+
             {/* Dark mode toggle */}
             <button className="theme-toggle" onClick={toggleTheme} title={isDark ? 'Light mode' : 'Dark mode'}>
               {isDark
@@ -157,7 +176,9 @@ export default function Navbar() {
                       <div style={{ fontSize: 11, color: 'var(--text-placeholder)', marginTop: 2 }}>
                         {roleLabel} · {user.city}
                       </div>
-                      <div style={{ fontSize: 11, color: '#1a7a3c', fontWeight: 600, marginTop: 3 }}><FontAwesomeIcon icon={faCoins} style={{ marginRight: 4 }} />{user.tokens ?? 0} tokens</div>
+                      <div style={{ fontSize: 11, color: '#1a7a3c', fontWeight: 600, marginTop: 3 }}>
+                        <FontAwesomeIcon icon={faCoins} style={{ marginRight: 4 }} />{user.tokens ?? 0} tokens
+                      </div>
                     </div>
                     {dropdownItems.map(item => (
                       <button key={item.path} className="dd-item" onClick={() => { navigate(item.path); setDropdownOpen(false) }}
@@ -196,7 +217,12 @@ export default function Navbar() {
       <div className={`mob-menu ${menuOpen ? 'open' : ''}`}>
         <Link to="/offers" className={`mob-link ${isActive('/offers') ? 'active' : ''}`} onClick={() => setMenuOpen(false)}>{t('nav.offers')}</Link>
         <Link to="/workers" className={`mob-link ${isActive('/workers') ? 'active' : ''}`} onClick={() => setMenuOpen(false)}>{t('nav.talents')}</Link>
-        {/* Mobile language switcher + theme toggle */}
+        {user && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', fontSize: 13, fontWeight: 700, color: '#1a7a3c' }}>
+            <FontAwesomeIcon icon={faCoins} />
+            {user.tokens ?? 0} tokens
+          </div>
+        )}
         <div style={{ display: 'flex', gap: 6, padding: '8px 0', alignItems: 'center' }}>
           {LANGS.map(l => (
             <button key={l.code} onClick={() => { i18n.changeLanguage(l.code); setMenuOpen(false) }}

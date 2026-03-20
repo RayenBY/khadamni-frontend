@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute'
 import { useAuth } from './store/AuthContext'
+import FloatingChat from './components/FloatingChat'
 
 // Public pages
 import Welcome from './pages/Welcome'
@@ -32,48 +33,53 @@ function GuestRoute({ children }) {
 
 function App() {
   return (
-    <Routes>
-      {/* Public */}
-      <Route path="/" element={<Welcome />} />
-      <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
-      <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
-      <Route path="/offers" element={<Offers />} />
-      <Route path="/offers/:id" element={<OfferDetail />} />
-      <Route path="/workers" element={<Workers />} />
-      <Route path="/user/:id" element={<PublicProfile />} />
+    <>
+      <Routes>
+        {/* Public */}
+        <Route path="/" element={<Welcome />} />
+        <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
+        <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
+        <Route path="/offers" element={<Offers />} />
+        <Route path="/offers/:id" element={<OfferDetail />} />
+        <Route path="/workers" element={<Workers />} />
+        <Route path="/user/:id" element={<PublicProfile />} />
 
-      {/* Protected: any authenticated user */}
-      <Route path="/map" element={
-        <ProtectedRoute><MapPage /></ProtectedRoute>
-      } />
-      <Route path="/dashboard" element={
-        <ProtectedRoute><Dashboard /></ProtectedRoute>
-      } />
-      <Route path="/profile" element={
-        <ProtectedRoute><Profile /></ProtectedRoute>
-      } />
-      <Route path="/messages" element={
-        <ProtectedRoute><Messages /></ProtectedRoute>
-      } />
-      <Route path="/messages/:id" element={
-        <ProtectedRoute><Chat /></ProtectedRoute>
-      } />
+        {/* Protected: any authenticated user */}
+        <Route path="/map" element={
+          <ProtectedRoute><MapPage /></ProtectedRoute>
+        } />
+        <Route path="/dashboard" element={
+          <ProtectedRoute><Dashboard /></ProtectedRoute>
+        } />
+        <Route path="/profile" element={
+          <ProtectedRoute><Profile /></ProtectedRoute>
+        } />
+        <Route path="/messages" element={
+          <ProtectedRoute><Messages /></ProtectedRoute>
+        } />
+        <Route path="/messages/:id" element={
+          <ProtectedRoute><Chat /></ProtectedRoute>
+        } />
 
-      {/* Employer only */}
-      <Route path="/post-offer" element={
-        <ProtectedRoute role="employer"><PostOffer /></ProtectedRoute>
-      } />
+        {/* Employer only */}
+        <Route path="/post-offer" element={
+          <ProtectedRoute role="employer"><PostOffer /></ProtectedRoute>
+        } />
 
-      {/* Worker only */}
-      <Route path="/post-worker-profile" element={
-        <ProtectedRoute role="worker"><PostWorkerProfile /></ProtectedRoute>
-      } />
+        {/* Worker only */}
+        <Route path="/post-worker-profile" element={
+          <ProtectedRoute role="worker"><PostWorkerProfile /></ProtectedRoute>
+        } />
 
-      {/* Admin only */}
-      <Route path="/admin" element={
-        <ProtectedRoute role="admin"><AdminDashboard /></ProtectedRoute>
-      } />
-    </Routes>
+        {/* Admin only */}
+        <Route path="/admin" element={
+          <ProtectedRoute role="admin"><AdminDashboard /></ProtectedRoute>
+        } />
+      </Routes>
+
+      {/* Global floating chat — appears on all pages when logged in */}
+      <FloatingChat />
+    </>
   )
 }
 
